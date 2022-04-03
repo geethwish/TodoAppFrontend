@@ -13,20 +13,27 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from "react-router-dom";
 
-import { CgLogIn } from 'react-icons/cg';
+import { useSelector, useDispatch } from "react-redux"
+
+import { logout, reset } from '../../features/auth/authSlice';
+
+import { CgLogIn, CgLogOut } from 'react-icons/cg';
 import { FaUserAlt } from 'react-icons/fa';
 
 import styles from './Header.module.scss'
+
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const Header = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { user } = useSelector((state) => state.auth)
 
     const [anchorElNav, setAnchorElNav] = useState(null);
     const [anchorElUser, setAnchorElUser] = useState(null);
-    const [isLogged, setIsLogged] = useState(false);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -52,6 +59,16 @@ const Header = () => {
     const navigateToRegister = () => {
 
         navigate("/register");
+
+    }
+
+    const onLogout = () => {
+
+        dispatch(logout());
+
+        dispatch(reset());
+
+        navigateToLogin()
 
     }
 
@@ -124,7 +141,7 @@ const Header = () => {
                         component="div"
                         sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
                     >
-                        LOGO
+                        Todo
                     </Typography>
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
@@ -143,61 +160,31 @@ const Header = () => {
 
                     </Box>
 
-                    {isLogged && <Box sx={{ flexGrow: 0 }}>
+                    {user && <Box sx={{ flexGrow: 0 }}>
 
-                        <Tooltip title="Open settings">
-
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-
-                            </IconButton>
-
-                        </Tooltip>
-
-                        <Menu
-                            sx={{ mt: '45px' }}
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                        >
-
-                            {settings.map((setting) => (
-
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-
-                                    <Typography textAlign="center">{setting}</Typography>
-
-                                </MenuItem>
-                            ))}
-
-                        </Menu>
+                        <Button color="inherit" onClick={onLogout} startIcon={<CgLogOut />}>
+                            Logout
+                        </Button>
 
                     </Box>
                     }
-                    {!isLogged && (
+
+                    {!user && (
                         <>
 
-                            <Button color="inherit" onClick={navigateToLogin}>
-
-                                <CgLogIn className={styles.iconMarginRight} /> Login
-
+                            <Button
+                                color="inherit"
+                                onClick={navigateToLogin}
+                                startIcon={<CgLogIn />}>
+                                Login
                             </Button>
 
-                            <Button color="inherit" onClick={navigateToRegister}>
-
-                                <FaUserAlt className={styles.iconMarginRight} />Register
-
+                            <Button
+                                color="inherit"
+                                onClick={navigateToRegister}
+                                startIcon={<FaUserAlt />}
+                            >
+                                Register
                             </Button>
 
                         </>

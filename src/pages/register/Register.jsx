@@ -28,7 +28,7 @@ function Register() {
 
         if (isError) {
 
-            toast.error(message)
+            toast.error(JSON.stringify(message))
         }
 
         if (isSuccess || (user && user.data)) {
@@ -107,7 +107,7 @@ function Register() {
                         Create an Account
                     </Typography>
 
-                    <Box component="form" noValidate onSubmit={(e) => handleSubmit(e)} sx={{ mt: 3 }}>
+                    <Box component="form" onSubmit={(e) => handleSubmit(e)} sx={{ mt: 3 }}>
 
                         <Grid container spacing={2}>
 

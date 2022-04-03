@@ -1,0 +1,44 @@
+.actionWrapper {
+    display: flex;
+    justify-content: end;
+
+}
+
+.titleSection {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.actionSection {
+    display: flex;
+    align-items: center;
+    width: 15rem;
+
+    @media (max-width:540px) {
+        margin-top: 1rem;
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+.todoWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (max-width:540px) {
+        flex-wrap: wrap;
+    }
+
+}
+
+.divider {
+    display: none;
+
+    @media (max-width:540px) {
+        width: 100%;
+        margin-top: 20px !important;
+        display: flex;
+    }
+}

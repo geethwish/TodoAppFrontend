@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -11,18 +11,64 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Paper } from '@mui/material';
+import Spinner from '../../components/spinner/Spinner';
+import { login, reset } from '../../features/auth/authSlice';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 const theme = createTheme();
 
 export default function Login() {
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { user, isError, message, isLoading, isSuccess, } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+
+        if (isError) {
+
+            toast.error(JSON.stringify(message))
+        }
+
+        if (isSuccess || (user && user.data)) {
+
+            navigate('/');
+
+        }
+
+        dispatch(reset());
+
+    }, [user, isError, message, isLoading, isSuccess, navigate, dispatch])
+
+
     const handleSubmit = (event) => {
         event.preventDefault();
+
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+
+        const password = data.get('password');
+        const email = data.get('email');
+
+        const userData = {
+            email,
+            password,
+        }
+
+        console.log(userData);
+
+        dispatch(login(userData))
+
+
     };
+
+    if (isLoading) {
+
+        return <Spinner />
+
+    }
 
     return (
         <ThemeProvider theme={theme}>

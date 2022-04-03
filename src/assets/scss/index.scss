@@ -5,3 +5,15 @@
 .mt-10 {
     margin-top: 100px !important;
 }
+
+.customBadges {
+    display: 'flex';
+    align-items: 'center';
+    justify-content: center;
+    width: max-content;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    border-radius: 5px;
+    color: #fff;
+}
