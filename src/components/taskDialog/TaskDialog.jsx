@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import {
     Grid,
@@ -10,13 +10,18 @@ import {
     DialogActions,
     DialogContent
 } from '@mui/material';
-import ImageUploader from 'react-images-upload';
+
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function TaskDialog(props) {
 
-    const { open, setOpen, handleSubmit, mode, data } = props;
-    const [pictures, setPictures] = useState([]);
-    const [imageURL, setImageURL] = useState("")
+    const { open, setOpen, handleSubmit, mode, data, imageCleaner, setImageCleaner } = props;
+
+    const imageFile = useRef(null);
+
+    const [imageURL, setImageURL] = useState(null);
+
 
     const handleClose = () => {
 
@@ -24,18 +29,46 @@ function TaskDialog(props) {
 
     };
 
-    const onDrop = (pictureFiles, pictureDataURLs) => {
-        setPictures(pictureFiles);
-        setImageURL(pictureDataURLs);
-        console.log(pictureFiles);
-        console.log(pictureDataURLs);
-    };
+
+    const handleCreate = (e) => {
+
+        handleSubmit(e);
+
+    }
+
+    const imageUploadHandle = (e) => {
+
+        const selected = e.target.files[0];
+        const objectUrl = URL.createObjectURL(selected)
+
+        setImageURL(objectUrl)
+
+    }
+
+    const clearImage = () => {
+
+        imageFile.value = "";
+
+        setImageURL(null)
+    }
+
+    useEffect(() => {
+
+        if (imageCleaner) {
+
+            clearImage();
+
+            setImageCleaner(false)
+
+        }
+
+    }, [imageCleaner])
 
 
     return (
         <Dialog open={open} onClose={handleClose}>
 
-            <Box component="form" onSubmit={(e) => handleSubmit(e)}>
+            <Box component="form" onSubmit={(e) => handleCreate(e)}>
 
                 <DialogTitle>{mode ? `Update Task ${data.task}` : "Add New Task"}</DialogTitle>
 
@@ -72,19 +105,43 @@ function TaskDialog(props) {
                         </Grid>
 
                         <Grid item xs={12}>
-                            <ImageUploader
-                                withIcon={true}
-                                buttonText='Choose images'
-                                onChange={onDrop}
-                                imgExtension={['.jpg', '.gif', '.png', '.gif']}
-                                maxFileSize={5242880}
-                                defaultImage={imageURL}
-                            />
 
                             {imageURL && (<img src={imageURL} alt="" width="100" />)}
 
+                        </Grid>
+
+                        <Grid item xs={12}>
+
+
+                            <Button
+                                variant="contained"
+                                component="label"
+                                startIcon={<FileUploadIcon />}
+                            >
+                                Upload File
+                                <input
+                                    type="file"
+                                    name='image'
+                                    hidden
+                                    onChange={imageUploadHandle}
+                                    ref={imageFile}
+                                />
+                            </Button>
+
+                            {imageURL && <Button
+                                variant="outlined"
+                                startIcon={<DeleteIcon />}
+                                sx={{ ml: 1 }}
+                                onClick={clearImage}
+                            >
+                                Delete
+                            </Button>}
 
                         </Grid>
+
+
+
+
 
                     </Grid>
 
