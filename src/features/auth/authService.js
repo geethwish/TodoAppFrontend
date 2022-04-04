@@ -10,7 +10,14 @@ const login = async (userData) => {
 
     if (response.data) {
 
-        localStorage.setItem('user', JSON.stringify(response.data))
+        if (response.data && response.data.data) {
+
+            localStorage.setItem('user', JSON.stringify(response.data))
+
+        } else {
+            throw new Error("Invalid Credential")
+        }
+
 
     }
 

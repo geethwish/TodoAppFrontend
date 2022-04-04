@@ -33,7 +33,9 @@ export default function Login() {
             toast.error(JSON.stringify(message))
         }
 
-        if (isSuccess || (user && user.data)) {
+        if (user && user.data) {
+
+            toast.success('Successfully Login')
 
             navigate('/');
 
@@ -45,6 +47,7 @@ export default function Login() {
 
 
     const handleSubmit = (event) => {
+
         event.preventDefault();
 
         const data = new FormData(event.currentTarget);
@@ -60,7 +63,6 @@ export default function Login() {
         console.log(userData);
 
         dispatch(login(userData))
-
 
     };
 
@@ -84,7 +86,6 @@ export default function Login() {
                         theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
                 }}
             >
-
                 <Container component="main" maxWidth="xs">
                     <CssBaseline />
                     <Box
@@ -149,7 +150,7 @@ export default function Login() {
 
                                 <Grid item>
 
-                                    <Link href="#" variant="body2">
+                                    <Link href="/register" variant="body2">
                                         {"Don't have an account? Sign Up"}
                                     </Link>
 

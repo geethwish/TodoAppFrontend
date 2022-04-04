@@ -11,7 +11,7 @@ import {
     DialogContent
 } from '@mui/material';
 
-import { createTodo, reset, getTodoList, deleteTodo, updateTodo } from '../../features/todo/todoSlice';
+import { createTodo, reset, getTodoList, updateTodo } from '../../features/todo/todoSlice';
 
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -52,6 +52,8 @@ function TaskDialog(props) {
 
 
     const handleClose = () => {
+
+        dispatch(getTodoList());
 
         setOpen(false);
 
@@ -114,13 +116,11 @@ function TaskDialog(props) {
 
             setMode(false);
             //setSelectedTodo(null)
-            toast.success("updated")
+
 
         } else {
 
             dispatch(createTodo(bodyFormData));
-
-            toast.success("Created")
 
         }
 
@@ -210,10 +210,6 @@ function TaskDialog(props) {
                             </Button>}
 
                         </Grid>
-
-
-
-
 
                     </Grid>
 

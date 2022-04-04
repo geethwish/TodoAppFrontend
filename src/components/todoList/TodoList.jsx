@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, } from 'react'
 import {
     Card,
     Avatar,
@@ -13,19 +13,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { blue, red } from '@mui/material/colors';
 
-import { createTodo, reset, getTodoList, updateTodo } from '../../features/todo/todoSlice';
+import { getTodoList, updateTodo } from '../../features/todo/todoSlice';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 import styles from './Todo.module.scss'
 
-
 function TodoList(props) {
 
     const dispatch = useDispatch();
 
-    const { todos, isError, message, isSuccess, } = useSelector((state) => state.todo);
+    const { isError, message, } = useSelector((state) => state.todo);
 
     const { edit, handleRemove, todo } = props;
 

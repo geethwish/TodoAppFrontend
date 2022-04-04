@@ -1,8 +1,6 @@
 import axios from "axios"
-import qs from "qs"
 
 const API_URL = '/api/todo';
-
 
 // Create Todo
 const createTodo = async (todoData, token) => {
@@ -15,7 +13,6 @@ const createTodo = async (todoData, token) => {
     }
 
     const response = await axios.post(API_URL, todoData, config);
-
 
     return response.data
 
@@ -47,7 +44,6 @@ const deleteTodo = async (id, token) => {
     }
 
     const response = await axios.delete(API_URL + `/${id}`, config);
-
 
     return response.data
 

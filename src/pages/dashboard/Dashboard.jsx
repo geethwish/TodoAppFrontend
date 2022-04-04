@@ -16,8 +16,6 @@ import {
     Stack,
 } from '@mui/material';
 
-
-
 //redux
 import { reset, getTodoList, deleteTodo } from '../../features/todo/todoSlice';
 
@@ -29,7 +27,7 @@ import DashboardSideWidget from '../../components/dashboardSideWidget/DashboardS
 // icons
 import { FaPlus } from 'react-icons/fa';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SendIcon from '@mui/icons-material/Send';
+import SearchIcon from '@mui/icons-material/Search';
 
 //styles
 import styles from "./Dashboard.module.scss"
@@ -85,7 +83,6 @@ function Dashboard() {
     const taskRemove = (id) => {
 
         dispatch(deleteTodo(id));
-
 
         setTimeout(() => {
 
@@ -162,7 +159,6 @@ function Dashboard() {
 
                     </Box>
 
-
                 </section>
 
                 <section>
@@ -175,15 +171,9 @@ function Dashboard() {
                                 display: 'flex',
                                 alignItems: 'center'
                             }}>
+
+
                                 <Grid item xs={12} sm={3}>
-
-                                    <Typography variant="subtitle" component="div">
-                                        You have  5 Pending  tasks
-                                    </Typography>
-
-                                </Grid>
-
-                                <Grid item xs={12} sm={2}>
                                     <Box>
                                         <ToggleButtonGroup
                                             color="primary"
@@ -191,6 +181,7 @@ function Dashboard() {
                                             exclusive
                                             onChange={handleStatusChange}
                                             size="small"
+                                            sx={{ width: '100%' }}
                                         >
                                             <ToggleButton value="Todo" color="error">Todo</ToggleButton>
 
@@ -203,7 +194,7 @@ function Dashboard() {
                                     </Box>
                                 </Grid>
 
-                                <Grid item xs={12} sm={2}>
+                                <Grid item xs={12} sm={3}>
 
                                     <TextField
                                         size='small' i
@@ -212,7 +203,7 @@ function Dashboard() {
                                         label="Filter Start Date"
                                         type="date"
                                         defaultValue="2022-04-03"
-                                        sx={{ width: 220 }}
+                                        sx={{ width: '100%' }}
                                         InputLabelProps={{
                                             shrink: true,
                                         }}
@@ -221,7 +212,7 @@ function Dashboard() {
 
                                 </Grid>
 
-                                <Grid item xs={12} sm={2}>
+                                <Grid item xs={12} sm={3}>
 
                                     <TextField
                                         size='small' i
@@ -230,7 +221,7 @@ function Dashboard() {
                                         type="date"
                                         name="endDate"
                                         defaultValue="2022-04-03"
-                                        sx={{ width: 220 }}
+                                        sx={{ width: '100%' }}
                                         InputLabelProps={{
                                             shrink: true,
                                         }}
@@ -243,8 +234,8 @@ function Dashboard() {
 
                                     <Stack direction="row" spacing={2}>
 
-                                        <Button variant="contained" endIcon={<SendIcon />} onClick={filterRequest}>
-                                            Filter Request
+                                        <Button variant="contained" fullWidth endIcon={<SearchIcon />} onClick={filterRequest}>
+                                            Filter
                                         </Button>
 
                                         <Button variant="outlined" startIcon={<DeleteIcon />} onClick={clearFilters}>
