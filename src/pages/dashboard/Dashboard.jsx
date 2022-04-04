@@ -1,38 +1,62 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-
+import { toast } from 'react-toastify';
 import Typography from '@mui/material/Typography';
-import { Container } from '@material-ui/core';
+import { CardContent, Container } from '@material-ui/core';
 import {
     Grid,
     Button,
     Box,
     Alert,
+    Card,
+    TextField,
+    ToggleButtonGroup,
+    ToggleButton,
+    Stack,
 } from '@mui/material';
 
-import { FaPlus } from 'react-icons/fa';
 
 
-import styles from "./Dashboard.module.scss"
+//redux
+import { reset, getTodoList, deleteTodo } from '../../features/todo/todoSlice';
+
+// components
 import TodoList from '../../components/todoList/TodoList';
 import TaskDialog from '../../components/taskDialog/TaskDialog';
-import { toast } from 'react-toastify';
-import { createTodo, reset, getTodoList } from '../../features/todo/todoSlice';
-import Spinner from '../../components/spinner/Spinner';
+import DashboardSideWidget from '../../components/dashboardSideWidget/DashboardSideWidget';
+
+// icons
+import { FaPlus } from 'react-icons/fa';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SendIcon from '@mui/icons-material/Send';
+
+//styles
+import styles from "./Dashboard.module.scss"
+
 
 function Dashboard() {
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const { user } = useSelector((state) => state.auth);
-    const { todos, isError, message, isLoading, isSuccess, } = useSelector((state) => state.todo);
+
+    const { todos, isError, message } = useSelector((state) => state.todo);
 
     const [open, setOpen] = useState(false);
 
     const [mode, setMode] = useState(false);
 
-    const [imageCleaner, setImageCleaner] = useState(false)
+    const [imageCleaner, setImageCleaner] = useState(false);
+
+    const [selectedTodo, setSelectedTodo] = useState(null);
+
+    const [filterStatus, setFilterStatus] = useState({
+        status: null,
+        startDate: null,
+        endDate: null
+    });
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -40,24 +64,14 @@ function Dashboard() {
 
     useEffect(() => {
 
-        if (!user) {
-            navigate('/login')
-        }
-
         if (isError) {
 
             toast.error(JSON.stringify(message))
         }
 
-        if (isSuccess && todos[0] && todos[0]) {
-
-            toast.success(todos[0].message);
-
-            setOpen(false)
+        if (!user) {
+            navigate('/login')
         }
-
-
-        setImageCleaner(true);
 
         dispatch(getTodoList());
 
@@ -67,56 +81,66 @@ function Dashboard() {
 
     }, [user, navigate, isError, message, dispatch])
 
-    const taskRemove = () => {
+    // Remove tasks
+    const taskRemove = (id) => {
 
-        alert("delete")
+        dispatch(deleteTodo(id));
+
+
+        setTimeout(() => {
+
+            dispatch(getTodoList());
+
+            toast.success("Task Deleted");
+
+        }, 300);
+
     }
 
-    const taskEdit = () => {
+    // Edit todo Task
+    const taskEdit = (todo) => {
 
         setMode(true);
 
         setOpen(true);
 
-    }
-
-    console.log(todos);
-
-    const handleSubmit = (event, file) => {
-
-        event.preventDefault();
-
-        const data = new FormData(event.currentTarget);
-        const bodyFormData = new FormData();
-
-        const task = data.get('task');
-        const description = data.get('description');
-        const image = data.get('image');
-
-        bodyFormData.append("task", task);
-        bodyFormData.append("description", description);
-        bodyFormData.append("status", "Todo");
-
-        if (data.get('image')) {
-
-            bodyFormData.append("image", image);
-
-        }
-
-        dispatch(createTodo(bodyFormData))
-
-    };
-
-    const handleStatusChange = (id, value) => {
-        alert(id)
-    }
-
-    if (isLoading) {
-
-        return <Spinner />
+        setSelectedTodo(todo)
 
     }
 
+    const handleStatusChange = async (e, status) => {
+
+        setFilterStatus({ ...filterStatus, status });
+
+        dispatch(getTodoList({ ...filterStatus, status }));
+
+    }
+
+    const dateFieldsHandle = (e) => {
+
+        setFilterStatus({ ...filterStatus, [e.target.name]: e.target.value })
+
+    }
+
+    const filterRequest = () => {
+
+        dispatch(getTodoList(filterStatus));
+
+        console.log(filterStatus);
+
+    }
+
+    const clearFilters = () => {
+
+        setFilterStatus({
+            status: null,
+            startDate: null,
+            endDate: null
+        });
+
+        dispatch(getTodoList());
+
+    }
     return (
         <>
             <Container maxWidth="xl">
@@ -141,6 +165,107 @@ function Dashboard() {
 
                 </section>
 
+                <section>
+                    <Card sx={{ mt: 4 }}>
+
+                        <CardContent>
+
+
+                            <Grid container spacing={2} sx={{
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}>
+                                <Grid item xs={12} sm={3}>
+
+                                    <Typography variant="subtitle" component="div">
+                                        You have  5 Pending  tasks
+                                    </Typography>
+
+                                </Grid>
+
+                                <Grid item xs={12} sm={2}>
+                                    <Box>
+                                        <ToggleButtonGroup
+                                            color="primary"
+                                            value={filterStatus}
+                                            exclusive
+                                            onChange={handleStatusChange}
+                                            size="small"
+                                        >
+                                            <ToggleButton value="Todo" color="error">Todo</ToggleButton>
+
+                                            <ToggleButton value="In Progress" color="info">In Progress</ToggleButton>
+
+                                            <ToggleButton value="Done" color="success">Done</ToggleButton>
+
+                                        </ToggleButtonGroup>
+
+                                    </Box>
+                                </Grid>
+
+                                <Grid item xs={12} sm={2}>
+
+                                    <TextField
+                                        size='small' i
+                                        id="date"
+                                        name="startDate"
+                                        label="Filter Start Date"
+                                        type="date"
+                                        defaultValue="2022-04-03"
+                                        sx={{ width: 220 }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        onChange={dateFieldsHandle}
+                                    />
+
+                                </Grid>
+
+                                <Grid item xs={12} sm={2}>
+
+                                    <TextField
+                                        size='small' i
+                                        id="date"
+                                        label="Filter End Date"
+                                        type="date"
+                                        name="endDate"
+                                        defaultValue="2022-04-03"
+                                        sx={{ width: 220 }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        onChange={dateFieldsHandle}
+                                    />
+
+                                </Grid>
+
+                                <Grid item xs={12} sm={3}>
+
+                                    <Stack direction="row" spacing={2}>
+
+                                        <Button variant="contained" endIcon={<SendIcon />} onClick={filterRequest}>
+                                            Filter Request
+                                        </Button>
+
+                                        <Button variant="outlined" startIcon={<DeleteIcon />} onClick={clearFilters}>
+                                            Clear
+                                        </Button>
+
+                                    </Stack>
+
+                                </Grid>
+
+                            </Grid>
+
+
+                        </CardContent>
+
+
+                    </Card>
+
+
+                </section>
+
                 <main>
                     <Grid container spacing={2} mt={3}>
 
@@ -153,7 +278,6 @@ function Dashboard() {
                                     todo={todo}
                                     handleRemove={taskRemove}
                                     edit={taskEdit}
-                                    handleStatusChange={(id, status) => handleStatusChange => (id, status)}
                                 />
                                 )}
 
@@ -165,27 +289,27 @@ function Dashboard() {
                         </Grid>
 
                         <Grid item xs={12} sm={4}>
-                            summary
+
+                            {user && <DashboardSideWidget user={user} />}
+
                         </Grid>
 
                     </Grid>
 
                 </main>
 
-                <TaskDialog
+                {open && <TaskDialog
                     open={open}
                     setOpen={setOpen}
                     mode={mode}
-                    data={[]}
-                    handleSubmit={(e, file) => handleSubmit(e, file)}
+                    setMode={setMode}
+                    todo={mode ? selectedTodo : {}}
                     setImageCleaner={setImageCleaner}
                     imageCleaner={imageCleaner}
-
                 />
-
+                }
 
             </Container>
-
 
         </>
     )

@@ -11,16 +11,44 @@ import {
     DialogContent
 } from '@mui/material';
 
+import { createTodo, reset, getTodoList, deleteTodo, updateTodo } from '../../features/todo/todoSlice';
+
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 function TaskDialog(props) {
 
-    const { open, setOpen, handleSubmit, mode, data, imageCleaner, setImageCleaner } = props;
+    const dispatch = useDispatch();
+
+    const { todos, isError, message, isSuccess, } = useSelector((state) => state.todo);
+
+    const { open, setOpen, mode, todo, setMode, imageCleaner, setImageCleaner } = props;
 
     const imageFile = useRef(null);
 
     const [imageURL, setImageURL] = useState(null);
+
+    useEffect(() => {
+
+        if (mode && todo) {
+
+            setImageURL(todo.image);
+
+        }
+
+        if (isError) {
+
+            toast.error(JSON.stringify(message))
+        }
+
+
+        return () => {
+            dispatch(reset());
+        }
+
+    }, [isError, message, dispatch, todo])
 
 
     const handleClose = () => {
@@ -29,12 +57,6 @@ function TaskDialog(props) {
 
     };
 
-
-    const handleCreate = (e) => {
-
-        handleSubmit(e);
-
-    }
 
     const imageUploadHandle = (e) => {
 
@@ -65,12 +87,60 @@ function TaskDialog(props) {
     }, [imageCleaner])
 
 
+    const handleSubmit = (event, file) => {
+
+        event.preventDefault();
+
+        const data = new FormData(event.currentTarget);
+        const bodyFormData = new FormData();
+
+        const task = data.get('task');
+        const description = data.get('description');
+        const image = data.get('image');
+
+        bodyFormData.append("task", task);
+        bodyFormData.append("description", description);
+        bodyFormData.append("status", "Todo");
+
+        if (data.get('image')) {
+
+            bodyFormData.append("image", image);
+
+        }
+
+        if (mode) {
+
+            dispatch(updateTodo([todo.id, bodyFormData]));
+
+            setMode(false);
+            //setSelectedTodo(null)
+            toast.success("updated")
+
+        } else {
+
+            dispatch(createTodo(bodyFormData));
+
+            toast.success("Created")
+
+        }
+
+        setTimeout(() => {
+
+            setOpen(false);
+
+            dispatch(getTodoList());
+
+        }, 200);
+
+    };
+
+
     return (
         <Dialog open={open} onClose={handleClose}>
 
-            <Box component="form" onSubmit={(e) => handleCreate(e)}>
+            <Box component="form" onSubmit={(e) => handleSubmit(e)}>
 
-                <DialogTitle>{mode ? `Update Task ${data.task}` : "Add New Task"}</DialogTitle>
+                <DialogTitle>{mode ? `Update Task ${todo.task}` : "Add New Task"}</DialogTitle>
 
 
                 <DialogContent>
@@ -87,6 +157,7 @@ function TaskDialog(props) {
                                 id="task"
                                 label="Task"
                                 autoFocus
+                                defaultValue={todo.task}
                             />
 
                         </Grid>
@@ -100,6 +171,7 @@ function TaskDialog(props) {
                                 label="Description"
                                 name="description"
                                 autoComplete="description"
+                                defaultValue={todo.description}
                             />
 
                         </Grid>

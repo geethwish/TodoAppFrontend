@@ -1,4 +1,5 @@
 import axios from "axios"
+import qs from "qs"
 
 const API_URL = '/api/todo';
 
@@ -21,7 +22,23 @@ const createTodo = async (todoData, token) => {
 };
 
 // Get Todo List
-const getTodoList = async (token) => {
+const getTodoList = async (params, token) => {
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        params
+    }
+
+    const response = await axios.get(API_URL + '/list', config);
+
+    return response.data
+
+};
+
+// Delete Todo
+const deleteTodo = async (id, token) => {
 
     const config = {
         headers: {
@@ -29,8 +46,24 @@ const getTodoList = async (token) => {
         }
     }
 
-    const response = await axios.get(API_URL + '/list', config);
+    const response = await axios.delete(API_URL + `/${id}`, config);
 
+
+    return response.data
+
+};
+
+// update Todo
+const updateTodo = async (id, todoData, token) => {
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+
+    const response = await axios.put(API_URL + `/${id}`, todoData, config);
 
     return response.data
 
@@ -38,7 +71,9 @@ const getTodoList = async (token) => {
 
 const todoService = {
     createTodo,
-    getTodoList
+    getTodoList,
+    deleteTodo,
+    updateTodo
 }
 
 export default todoService
